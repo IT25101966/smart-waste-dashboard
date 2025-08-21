@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <title>Smart Waste • Dashboard + Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #0f172a;
@@ -25,7 +25,7 @@
       display:flex;flex-direction:column;
     }
 
-    /* Common styled buttons */
+    /* common buttons */
     .btn-main {
       display:inline-flex; align-items:center; justify-content:center; gap:8px;
       background: linear-gradient(90deg, var(--accent1), var(--accent2));
@@ -39,13 +39,7 @@
     .btn-main:hover { opacity:.9; }
     .btn-main:active { transform:scale(.97); }
     .btn-main svg { width:16px; height:16px; }
-
-    /* Ghost variant (Logout style) */
-    .btn-ghost {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: var(--text);
-    }
+    .btn-ghost { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); }
     .btn-ghost:hover { background: rgba(255,255,255,0.12); }
 
     /* login view */
@@ -71,26 +65,17 @@
     .row{display:flex;gap:10px;margin-top:14px}
     .err{margin-top:10px;color:var(--danger);font-size:13px;min-height:16px;text-align:center}
 
-    /* app view */
-    header{text-align:center;padding:30px 20px}
-    header h2{
-      margin:0;font-size:32px;font-weight:800;
-      background:linear-gradient(90deg,var(--accent1),var(--accent2));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    /* header + topbar row */
+    .topbar-row {
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 20px;
+      margin-top:0.5cm; /* 👈 move down 0.5 cm */
+      display:flex;
+      align-items:center;
+      justify-content:space-between; /* left: user info, right: logout */
     }
-    header p{color:var(--muted);margin-top:6px}
-    .topbar{margin-top:10px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-    .pill{
-      background:rgba(255,255,255,0.1);
-      padding:6px 12px;
-      border-radius:999px;
-      font-size:13px;color:var(--muted)
-    }
-    /* user info left-top */
-    .user-info{
-      max-width:1100px; margin:0 auto 10px; padding:0 20px;
-      display:flex; align-items:center; gap:10px; justify-content:flex-start;
-    }
+    .user-info{display:flex;align-items:center;gap:10px}
     .user-info .avatar{
       width:36px;height:36px;border-radius:50%;
       background:rgba(255,255,255,0.1);
@@ -98,6 +83,15 @@
     }
     .user-info .avatar svg{width:20px;height:20px;color:var(--muted)}
     #userEmail{font-size:14px;font-weight:600;color:var(--text)}
+
+    /* dashboard content */
+    header{text-align:center;padding:30px 20px}
+    header h2{
+      margin:0;font-size:32px;font-weight:800;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    header p{color:var(--muted);margin-top:6px}
 
     .wrap{flex:1;max-width:1100px;margin:auto;padding:20px;display:grid;gap:20px}
     .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
@@ -115,19 +109,17 @@
     .value{font-size:40px;font-weight:800;margin:10px 0}
     progress{width:100%;height:14px;border-radius:999px;overflow:hidden}
     progress::-webkit-progress-bar{background:#1e293b}
-    progress::-webkit-progress-value{
-      background:linear-gradient(90deg,var(--accent1),var(--accent2));
-      transition:width .5s ease;
-    }
+    progress::-webkit-progress-value{background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .5s ease;}
     footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:right}
-    @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
     /* badges */
     .badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
     .badge-ok{background:rgba(34,197,94,0.2);color:#22c55e}
     .badge-high{background:rgba(250,204,21,0.2);color:#facc15}
     .badge-full{background:rgba(239,68,68,0.2);color:#ef4444}
+
+    @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
@@ -150,33 +142,34 @@
 
   <!-- DASHBOARD -->
   <section id="appView" style="display:none">
-    <!-- user icon + email at the very top-left -->
-    <div class="user-info">
-      <div class="avatar" aria-hidden="true">
+    <!-- user + logout row -->
+    <div class="topbar-row">
+      <div class="user-info">
+        <div class="avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+        <span id="userEmail">—</span>
+      </div>
+
+      <button id="btnLogout" class="btn-main btn-ghost">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
-          <circle cx="12" cy="7" r="4" />
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <path d="M16 17l5-5-5-5" />
+          <path d="M21 12H9" />
         </svg>
-      </div>
-      <span id="userEmail">—</span>
+        <span class="label">Logout</span>
+      </button>
     </div>
 
     <header>
       <h2>Smart Waste Dashboard</h2>
       <p>Live levels • Buzzer & Diverter control</p>
-      <div class="topbar">
-        <button id="btnLogout" class="btn-main btn-ghost" title="Logout" aria-label="Logout">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <path d="M16 17l5-5-5-5" />
-            <path d="M21 12H9" />
-          </svg>
-          <span class="label">Logout</span>
-        </button>
-      </div>
     </header>
 
     <div class="wrap">
@@ -208,7 +201,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <script>
-    // === Your Firebase config ===
     const firebaseConfig = {
       apiKey: "AIzaSyA3PnnypErikHB7AxzWQoBdoDEXj9fvzl8",
       authDomain: "smartwaste-54559.firebaseapp.com",
@@ -248,9 +240,7 @@
 
     let refs={};
     function startApp(u){
-      // set email to left-top user info
-      const emailSpan=document.getElementById('userEmail');
-      if(emailSpan) emailSpan.textContent = u.email || u.uid;
+      document.getElementById('userEmail').textContent = u.email || u.uid;
 
       const cardsEl=document.getElementById('cards');cardsEl.innerHTML='';
       bins.forEach(b=>cardsEl.appendChild(makeCard(b)));

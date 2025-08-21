@@ -7,6 +7,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    /* Auth buttons — glossy gradients + hover lift */
+.btn-auth{
+  flex:1;
+  border:none;
+  border-radius:12px;
+  padding:12px 16px;
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+  cursor:pointer;
+  transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+}
+.btn-auth:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.45); }
+.btn-auth:active{ transform:translateY(0); opacity:.9; }
+
+/* Sign in → green */
+.btn-signin{ background:linear-gradient(135deg,#16a34a,#22c55e); }
+
+/* Sign up → blue */
+.btn-signup{ background:linear-gradient(135deg,#2563eb,#3b82f6); }
+
+/* Google → Google-ish green→blue */
+.btn-google{ background:linear-gradient(135deg,#34a853,#4285f4); }
+
     :root {
       --bg: #0f172a;
       --card: rgba(255,255,255,0.06);
@@ -132,12 +157,14 @@
       <label>Email</label><input id="email" type="email" placeholder="you@example.com" />
       <label>Password</label><input id="pass" type="password" placeholder="••••••••" />
       <div class="row">
-        <button id="btnLogin" class="btn-main">Sign in</button>
-        <button id="btnSignup" class="btn-main">Sign up</button>
-      </div>
-      <div class="row"><button id="btnGoogle" class="btn-main">Continue with Google</button></div>
-      <div id="msg" class="err"></div>
-    </div>
+  <button id="btnLogin"  class="btn-auth btn-signin">Sign in</button>
+  <button id="btnSignup" class="btn-auth btn-signup">Sign up</button>
+</div>
+
+<div class="row">
+  <button id="btnGoogle" class="btn-auth btn-google">Continue with Google</button>
+</div>
+
   </section>
 
   <!-- DASHBOARD -->

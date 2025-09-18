@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Smart Waste • Dashboard + Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ... (CSS එක unchanged - same as before) ... */
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="center" aria-label="Login form">
+    <div class="box" role="form" aria-describedby="msg">
+      <h1>Welcome</h1>
+      <p>Sign in to Smart Waste Dashboard</p>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="username" />
+
+      <label for="pass">Password</label>
+      <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+      <div class="row">
+        <button type="button" id="btnLogin"  class="btn-auth btn-signin">Sign in</button>
+        <button type="button" id="btnSignup" class="btn-auth btn-signup">Sign up</button>
+      </div>
+
+      <div class="row">
+        <button type="button" id="btnGoogle" class="btn-auth btn-google">Continue with Google</button>
+      </div>
+
+      <div id="msg" class="err" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="appView" style="display:none">
+    <div class="topbar-row">
+      <div class="user-info">
+        <div class="avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+        <span id="userEmail">—</span>
+      </div>
+
+      <button type="button" id="btnLogout" class="btn-main btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <path d="M16 17l5-5-5-5" />
+          <path d="M21 12H9" />
+        </svg>
+        <span class="label">Logout</span>
+      </button>
+    </div>
+
+    <header>
+      <h2>Smart Waste Dashboard</h2>
+      <p>Live levels • Buzzer & Diverter control</p>
+    </header>
+
+    <div class="wrap">
+      <div class="grid" id="cards"></div>
+
+      <div class="card">
+        <div class="title">Controls</div>
+        <div class="row" style="align-items:center;gap:12px">
+          <button type="button" id="btnBuzzer" class="btn-main">🔔 Toggle Buzzer</button>
+          <span class="pill">State: <b id="buzzerState">…</b></span>
+        </div>
+        <div class="row" style="align-items:center;gap:12px;margin-top:14px">
+          <label for="selDiv">🚦 Diverter:</label>
+          <select id="selDiv">
+            <option value="0">0 - Paper</option>
+            <option value="1">1 - Wet</option>
+            <option value="2">2 - Metal</option>
+            <option value="3">3 - Plastic</option> <!-- 👉 NEW -->
+          </select>
+          <span class="pill">Current: <b id="divState">…</b></span>
+        </div>
+        <footer>Last update: <span id="lastUpdate">—</span></footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script>
+    // --- Firebase config (unchanged) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyA3PnnypErikHB7AxzWQoBdoDEXj9fvzl8",
+      authDomain: "smartwaste-54559.firebaseapp.com",
+      databaseURL: "https://smartwaste-54559-default-rtdb.firebaseio.com",
+      projectId: "smartwaste-54559",
+      storageBucket: "smartwaste-54559.firebasestorage.app",
+      messagingSenderId: "608437398021",
+      appId: "1:608437398021:web:79fe5b2362e70cc95c4a6c",
+      measurementId: "G-PL74RBYS50"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db   = firebase.database();
+
+    const loginView = document.getElementById('loginView');
+    const appView   = document.getElementById('appView');
+    const $ = id => document.getElementById(id);
+
+    // 👉 bins array updated with plastic
+    const bins = [
+      {key:'paper',   label:'Paper 📰'},
+      {key:'wet',     label:'Wet 🍃'},
+      {key:'metal',   label:'Metal 🥫'},
+      {key:'plastic', label:'Plastic 🧴'}
+    ];
+
+    function show(view){ loginView.style.display = view==='login'?'':'none'; appView.style.display = view==='app'?'':'none'; }
+
+    function makeCard(b){
+      const el=document.createElement('div'); el.className='card';
+      el.innerHTML = `
+        <div class="title"><span>${b.label}</span><span id="${b.key}-badge"></span></div>
+        <div class="value"><span id="${b.key}-val">0</span>%</div>
+        <progress id="${b.key}-bar" max="100" value="0"></progress>`;
+      return el;
+    }
+    function updateCard(key,val){
+      const v=Math.max(0,Math.min(100,Number(val)||0));
+      $(`${key}-val`).textContent=v;
+      $(`${key}-bar`).value=v;
+      const badge=$(`${key}-badge`);
+      if(v>=90) badge.innerHTML='<span class="badge badge-full">FULL</span>';
+      else if(v>=70) badge.innerHTML='<span class="badge badge-high">High</span>';
+      else badge.innerHTML='<span class="badge badge-ok">OK</span>';
+    }
+    function timeago(ts){
+      if(!ts) return '—';
+      const d=new Date(ts), diff=(Date.now()-d)/1000;
+      if(diff<60) return `${Math.floor(diff)}s ago`;
+      if(diff<3600) return `${Math.floor(diff/60)}m ago`;
+      if(diff<86400) return `${Math.floor(diff/3600)}h ago`;
+      return d.toLocaleString();
+    }
+
+    let refs = {};
+    function startApp(user){
+      $('userEmail').textContent = user.email || user.uid;
+
+      const cardsEl = document.getElementById('cards');
+      cardsEl.innerHTML = '';
+      bins.forEach(b => cardsEl.appendChild(makeCard(b)));
+
+      refs.bins   = db.ref('bins');
+      refs.buzzer = db.ref('commands/buzzer');
+      refs.div    = db.ref('commands/diverter');
+      refs.last   = db.ref('status/lastUpdate');
+
+      refs.bins.on('value', s => {
+        const d = s.val() || {};
+        bins.forEach(b => updateCard(b.key, d[b.key] || 0));
+        refs.last.set(Date.now());
+      });
+      refs.buzzer.on('value', s => { $('buzzerState').textContent = s.val() ? 'ON' : 'OFF'; });
+      refs.div.on('value', s => {
+        const v = s.val() || 0;
+        $('divState').textContent = v;
+        $('selDiv').value = v;
+      });
+      refs.last.on('value', s => { $('lastUpdate').textContent = timeago(s.val()); });
+
+      $('btnBuzzer').onclick = async () => {
+        try{
+          const cur = (await refs.buzzer.get()).val() === true;
+          refs.buzzer.set(!cur);
+        }catch(e){ alert('Could not toggle buzzer. Please try again.'); }
+      };
+      $('selDiv').onchange = e => refs.div.set(Number(e.target.value || 0));
+      $('btnLogout').onclick = () => auth.signOut();
+    }
+
+    auth.onAuthStateChanged(u => { if(u){ show('app'); startApp(u); } else { show('login'); } });
+
+    // auth error handling (unchanged) ...
+  </script>
+</body>
+</html>

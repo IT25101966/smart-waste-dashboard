@@ -6,7 +6,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ... (CSS එක unchanged - same as before) ... */
+    /* Auth buttons — glossy gradients + hover lift */
+    .btn-auth{
+      flex:1; border:none; border-radius:12px;
+      padding:12px 16px; font-size:15px; font-weight:700; color:#fff;
+      cursor:pointer; transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+    }
+    .btn-auth:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.45); }
+    .btn-auth:active{ transform:translateY(0); opacity:.9; }
+    .btn-signin{ background:linear-gradient(135deg,#16a34a,#22c55e); }   /* green */
+    .btn-signup{ background:linear-gradient(135deg,#2563eb,#3b82f6); }   /* blue  */
+    .btn-google{ background:linear-gradient(135deg,#34a853,#4285f4); }   /* google-ish */
+
+    :root{
+      --bg:#0f172a; --card:rgba(255,255,255,0.06); --text:#e5e7eb; --muted:#94a3b8;
+      --accent1:#22c55e; --accent2:#3b82f6; --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:'Inter',sans-serif}
+    body{margin:0;background:linear-gradient(135deg,#0b1022,#0f172a);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+    /* common buttons (dashboard) */
+    .btn-main{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:#fff;border:none;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;
+      transition:transform .15s,opacity .2s;
+    }
+    .btn-main:hover{opacity:.9} .btn-main:active{transform:scale(.97)} .btn-main svg{width:16px;height:16px}
+    .btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15)} .btn-ghost:hover{background:rgba(255,255,255,.12)}
+
+    /* login view */
+    .center{min-height:100vh;display:grid;place-items:center}
+    .box{width:min(420px,92%);background:var(--card);border-radius:20px;padding:30px 24px;backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.5);animation:fadeIn .6s ease}
+    h1{margin:0 0 6px;font-size:28px;font-weight:700}
+    p{margin:0 0 18px;color:var(--muted)}
+    label{display:block;margin:12px 0 6px;color:var(--muted);font-size:14px}
+    input{width:100%;padding:12px 14px;border-radius:12px;border:none;outline:none;background:#1e293b;color:var(--text)}
+    input:focus{outline:2px solid rgba(59,130,246,.5)}
+    .row{display:flex;gap:10px;margin-top:14px}
+    .err{margin-top:12px;color:var(--danger);font-size:13px;min-height:18px;text-align:center}
+
+    /* header + topbar row */
+    .topbar-row{max-width:1100px;margin:0 auto;padding:0 20px;margin-top:0.5cm;display:flex;align-items:center;justify-content:space-between}
+    .user-info{display:flex;align-items:center;gap:10px}
+    .user-info .avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center}
+    .user-info .avatar svg{width:20px;height:20px;color:var(--muted)}
+    #userEmail{font-size:14px;font-weight:600;color:var(--text)}
+
+    /* dashboard content */
+    header{text-align:center;padding:30px 20px}
+    header h2{margin:0;font-size:32px;font-weight:800;background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    header p{color:var(--muted);margin-top:6px}
+    .wrap{flex:1;max-width:1100px;margin:auto;padding:20px;display:grid;gap:20px}
+    .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .card{background:var(--card);border-radius:20px;padding:20px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .2s;animation:fadeInUp .5s ease}
+    .card:hover{transform:translateY(-4px)}
+    .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:14px;color:var(--muted)}
+    .value{font-size:40px;font-weight:800;margin:10px 0}
+    progress{width:100%;height:14px;border-radius:999px;overflow:hidden}
+    progress::-webkit-progress-bar{background:#1e293b}
+    progress::-webkit-progress-value{background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .5s ease}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:right}
+
+    /* badges + small pills */
+    .badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .badge-ok{background:rgba(34,197,94,0.2);color:#22c55e}
+    .badge-high{background:rgba(250,204,21,0.2);color:#facc15}
+    .badge-full{background:rgba(239,68,68,0.2);color:#ef4444}
+    .pill{background:rgba(255,255,255,.1);padding:6px 12px;border-radius:999px;font-size:13px;color:var(--muted)}
+
+    @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
@@ -24,12 +95,12 @@
       <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
 
       <div class="row">
-        <button type="button" id="btnLogin"  class="btn-auth btn-signin">Sign in</button>
-        <button type="button" id="btnSignup" class="btn-auth btn-signup">Sign up</button>
+        <button type="button" id="btnLogin"  class="btn-auth btn-signin" aria-label="Sign in">Sign in</button>
+        <button type="button" id="btnSignup" class="btn-auth btn-signup" aria-label="Create account">Sign up</button>
       </div>
 
       <div class="row">
-        <button type="button" id="btnGoogle" class="btn-auth btn-google">Continue with Google</button>
+        <button type="button" id="btnGoogle" class="btn-auth btn-google" aria-label="Continue with Google">Continue with Google</button>
       </div>
 
       <div id="msg" class="err" role="status" aria-live="polite"></div>
@@ -38,9 +109,10 @@
 
   <!-- DASHBOARD -->
   <section id="appView" style="display:none">
+    <!-- user + logout row -->
     <div class="topbar-row">
       <div class="user-info">
-        <div class="avatar">
+        <div class="avatar" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
@@ -51,9 +123,9 @@
         <span id="userEmail">—</span>
       </div>
 
-      <button type="button" id="btnLogout" class="btn-main btn-ghost">
+      <button type="button" id="btnLogout" class="btn-main btn-ghost" title="Logout" aria-label="Logout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
           <path d="M16 17l5-5-5-5" />
           <path d="M21 12H9" />
@@ -68,8 +140,7 @@
     </header>
 
     <div class="wrap">
-      <div class="grid" id="cards"></div>
-
+      <div class="grid" id="cards"><!-- cards injected --></div>
       <div class="card">
         <div class="title">Controls</div>
         <div class="row" style="align-items:center;gap:12px">
@@ -82,7 +153,6 @@
             <option value="0">0 - Paper</option>
             <option value="1">1 - Wet</option>
             <option value="2">2 - Metal</option>
-            <option value="3">3 - Plastic</option> <!-- 👉 NEW -->
           </select>
           <span class="pill">Current: <b id="divState">…</b></span>
         </div>
@@ -97,7 +167,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <script>
-    // --- Firebase config (unchanged) ---
+    // --- Firebase config (yours) ---
     const firebaseConfig = {
       apiKey: "AIzaSyA3PnnypErikHB7AxzWQoBdoDEXj9fvzl8",
       authDomain: "smartwaste-54559.firebaseapp.com",
@@ -117,12 +187,10 @@
     const appView   = document.getElementById('appView');
     const $ = id => document.getElementById(id);
 
-    // 👉 bins array updated with plastic
     const bins = [
-      {key:'paper',   label:'Paper 📰'},
-      {key:'wet',     label:'Wet 🍃'},
-      {key:'metal',   label:'Metal 🥫'},
-      {key:'plastic', label:'Plastic 🧴'}
+      {key:'paper',label:'Paper 📰'},
+      {key:'wet',label:'Wet 🍃'},
+      {key:'metal',label:'Metal 🥫'}
     ];
 
     function show(view){ loginView.style.display = view==='login'?'':'none'; appView.style.display = view==='app'?'':'none'; }
@@ -191,7 +259,56 @@
 
     auth.onAuthStateChanged(u => { if(u){ show('app'); startApp(u); } else { show('login'); } });
 
-    // auth error handling (unchanged) ...
+    // ---- Humanized auth errors ----
+    function friendlyAuthError(err){
+      const code = (err && err.code) ? String(err.code) : '';
+      switch(code){
+        case 'auth/invalid-email': return 'Invalid email address. Please check and try again.';
+        case 'auth/missing-password':
+        case 'auth/weak-password': return 'Please enter a stronger password (at least 6 characters).';
+        case 'auth/user-not-found': return 'No account for this email. Try Sign up.';
+        case 'auth/wrong-password': return 'Incorrect password. Please try again.';
+        case 'auth/email-already-in-use': return 'This email is already registered. Try signing in.';
+        case 'auth/popup-closed-by-user': return 'Google sign-in was cancelled.';
+        case 'auth/operation-not-allowed': return 'This sign-in method is disabled in Firebase console.';
+        case 'auth/network-request-failed': return 'Network error. Check your connection and try again.';
+        case 'auth/domain-config-required': return 'This domain is not authorized in Firebase → Authorized domains.';
+        default: return (err && err.message) ? err.message : 'Something went wrong. Please try again.';
+      }
+    }
+    function setErr(t){ $('msg').textContent = t || ''; }
+
+    // Basic email check to guide users early
+    function looksLikeEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+    $('btnLogin').onclick = async () => {
+      setErr('');
+      const email = $('email').value.trim();
+      const pass  = $('pass').value;
+      if(!looksLikeEmail(email)) return setErr('Please enter a valid email address.');
+      if(!pass) return setErr('Please enter your password.');
+      try{
+        await auth.signInWithEmailAndPassword(email, pass);
+      }catch(e){ setErr(friendlyAuthError(e)); }
+    };
+
+    $('btnSignup').onclick = async () => {
+      setErr('');
+      const email = $('email').value.trim();
+      const pass  = $('pass').value;
+      if(!looksLikeEmail(email)) return setErr('Please enter a valid email to create your account.');
+      if(!pass || pass.length < 6) return setErr('Use a password with at least 6 characters.');
+      try{
+        await auth.createUserWithEmailAndPassword(email, pass);
+      }catch(e){ setErr(friendlyAuthError(e)); }
+    };
+
+    $('btnGoogle').onclick = async () => {
+      setErr('');
+      try{
+        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      }catch(e){ setErr(friendlyAuthError(e)); }
+    };
   </script>
 </body>
 </html>
